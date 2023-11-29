@@ -1,6 +1,9 @@
 let imgFundo, imgFly, imgHit;
-let fundo, bird, canos;
-let gameOver, gameStart 
+let fundo, bird, canos, placar;
+let gameOver, gameStart;
+let score, hiScore;
+
+const velCano = -4
 
 function preload() {
     imgFundo = loadImage('./assets/bg.png');
@@ -14,9 +17,16 @@ function setup() {
     gameStart = false;
     gameOver = false;
 
+    score = 0;
+    hiScore = localStorage.getItem("hiScore");
+    if (!hiScore) {
+        hiScore = 0;
+    }
+
     world.gravity.y = 0;
 
     fundo = new Group();
+    fundo.layer = 0;
     fundo.addAni(imgFundo);
     fundo.collider = "n";
     fundo.y = height / 2;
@@ -36,8 +46,8 @@ function setup() {
     bird.x = bird.radius + 10;
     bird.y = height / 2;
     bird.ani.scale = 0.5;
-
-   // bird.debug = true;
+    // bird.debug = true;
+    criaPlacar();
 }
 
 function draw() {
@@ -46,7 +56,7 @@ function draw() {
             // inicio do jogo
             gameStart = true;
             fundo.vel.x = -3;
-            canos.vel.x = -3;
+            canos.vel.x = velCano;
          world.gravity.y = 14;
 
         }
@@ -69,7 +79,10 @@ function moveFundo() {
     for (let i = 0; i < fundo.length; ++i) {
         const f = fundo[i];
         if (f.x < -width) {
-            f.x = width * 2
+            f.remove();
+            const uf = fundo[fundo.length - 1];
+            const nf = new fundo.Sprite();
+            nf.x = uf.x + nf.w;
         }
     }
 }
@@ -82,12 +95,26 @@ function moveCanos() {
             baixo.remove();
             const ultimo = canos[canos.length - 1];
             criaPipes(ultimo.x + width / 2);
-            canos.vel.x = -4;
+            canos.vel.x = velCano;
+            pontua();
         }
+}
+
+function pontua() {
+    if (!gameOver) {
+    score++;
+    if (score > hiScore) {
+        hiScore = score;
+        localStorage.setItem("hiScore", hiScore);
+    }
+    escrevePlacar();
+    }
+    console.log(score, hiScore);   
 }
 
 function criaCanos() {
     canos = new Group();
+    canos.layer = 5;
     for (let i = 0; i < 3; i++) {
         criaPipes(i * width / 2 + width);
 
@@ -97,7 +124,7 @@ function criaCanos() {
 function criaPipes(x) {
     const gap = new Sprite();
     gap.collider = 'n';
-    gap.h = 160;
+    gap.h = 200 //160;
     gap.y = random(gap.h, height - gap.h);
     gap.x = x; 
 
@@ -116,4 +143,25 @@ function criaPipes(x) {
     baixo.y = gap.y + (pipe.h / 2 + gap.h / 2);
 
     gap.remove();
+}
+function criaPlacar() {
+    placar = new Group();
+    placar.collider = 'n';
+    placar.w = width / 2;
+    placar.h = 50;
+    placar.y = placar.h / 2;
+    placar.textSize = 20;
+    placar.color = "#ffffffaa"
+    placar.strokeWeight = 0;
+
+    const s = new placar.Sprite();
+    s.x = placar.w / 2;
+    const hs = new placar.Sprite();
+    hs.x = width - placar.w / 2;
+    escrevePlacar();
+}
+
+function escrevePlacar() { 
+    placar[0].text = "Score: " + score;
+    placar[1].text = "hiScore: " + hiScore;
 }

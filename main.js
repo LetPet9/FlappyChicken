@@ -19,9 +19,9 @@ function setup() {
   paredinhas = new Group();
   paredinhas.collider = "k";
   paredinhas.visible = false;
-  let chao = new paredinhas.Sprite(200, 400, 400, 10);
-  let pEsq = new paredinhas.Sprite(0, 200, 10, 400);
-  let pDir = new paredinhas.Sprite(400, 200, 10, 400);
+  new paredinhas.Sprite(200, 400, 400, 10);
+  new paredinhas.Sprite(0, 200, 10, 400);
+  new paredinhas.Sprite(400, 200, 10, 400);
 }
 
 function draw() {
