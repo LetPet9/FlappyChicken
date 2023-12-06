@@ -1,5 +1,5 @@
 let imgFundo, imgFly, imgHit;
-let fundo, bird, canos, placar;
+let fundo, bird, canos, placar, go;
 let gameOver, gameStart;
 let score, hiScore;
 
@@ -43,9 +43,10 @@ function setup() {
     bird.addAni('hit', imgHit, {frameSize: [117, 98], frames: 2});
     bird.changeAni('fly');
     bird.radius = 20;
-    bird.x = bird.radius + 10;
+    bird.x = bird.radius + 20;
     bird.y = height / 2;
     bird.ani.scale = 0.5;
+    bird.bounciness = 0;
     // bird.debug = true;
     criaPlacar();
 }
@@ -63,9 +64,10 @@ function draw() {
             // sobe bicho
             bird.vel.y = -7;
     }
-
+    if(gameStart && !gameOver) {
     moveFundo();
     moveCanos();
+    }
     bird.y = constrain(bird.y, bird.radius, height - bird.radius);
     if (bird.vel.y > 0) {
         bird.rotateTo(30, 3);
@@ -74,6 +76,7 @@ function draw() {
     } else {
         bird.rotateTo(-15, 3);
     }
+    bird.collides(canos, bateu);
 }
 function moveFundo() {
     for (let i = 0; i < fundo.length; ++i) {
@@ -115,6 +118,7 @@ function pontua() {
 function criaCanos() {
     canos = new Group();
     canos.layer = 5;
+    canos.bounciness = 0;
     for (let i = 0; i < 3; i++) {
         criaPipes(i * width / 2 + width);
 
@@ -150,8 +154,8 @@ function criaPlacar() {
     placar.w = width / 2;
     placar.h = 50;
     placar.y = placar.h / 2;
-    placar.textSize = 20;
-    placar.color = "#ffffffaa"
+    placar.textSize = 24;
+    placar.color = "#ffffffaa";
     placar.strokeWeight = 0;
 
     const s = new placar.Sprite();
@@ -164,4 +168,21 @@ function criaPlacar() {
 function escrevePlacar() { 
     placar[0].text = "Score: " + score;
     placar[1].text = "hiScore: " + hiScore;
+}
+
+function bateu(gainha, cano) {
+    gainha.changeAni("hit");
+    gainha.ani.scale = 0.5;
+    canos.vel.x = 0;
+    fundo.vel.x = 0;
+    gameOver = true;
+    cano.color = "purple";
+    go = new Sprite();
+    go.w = width * 0.8;
+    go.h = height / 2;
+    go.collider = "n";
+    go.color = "#ffffffaa";
+    go.textSize = 20;
+    go.strokeWeight = 0;
+    go.text = "Aperte ENTER para reiniciar";
 }
