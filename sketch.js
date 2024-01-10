@@ -11,19 +11,31 @@ function preload() {
     imgHit = loadImage('./assets/chickGotHit.png')
 }
 
+function initialize() {
+    gameStart = false;
+    gameOver = false;
+    score = 0;
+    world.gravity.y = 0; 
+}
+
+function initializeBird() {
+    bird.changeAni('fly');
+    bird.ani.scale = 0.5;
+    bird.x = bird.radius + 20;
+    bird.y = height / 2;
+    bird.vel.x = 0;
+    bird.vel.y = 0;
+}
+
 function setup() {
     new Canvas(360, 640);
 
-    gameStart = false;
-    gameOver = false;
+    initialize();
 
-    score = 0;
     hiScore = localStorage.getItem("hiScore");
     if (!hiScore) {
         hiScore = 0;
     }
-
-    world.gravity.y = 0;
 
     fundo = new Group();
     fundo.layer = 0;
@@ -43,9 +55,7 @@ function setup() {
     bird.addAni('hit', imgHit, {frameSize: [117, 98], frames: 2});
     bird.changeAni('fly');
     bird.radius = 20;
-    bird.x = bird.radius + 20;
-    bird.y = height / 2;
-    bird.ani.scale = 0.5;
+    initializeBird();
     bird.bounciness = 0;
     // bird.debug = true;
     criaPlacar();
@@ -77,6 +87,15 @@ function draw() {
         bird.rotateTo(-15, 3);
     }
     bird.collides(canos, bateu);
+
+    if (gameOver && kb.pressed("enter")) {
+        initialize();
+        go.remove();
+        escrevePlacar();
+        initializeBird();
+        canos.removeAll();
+        criaCanos();
+    }
 }
 function moveFundo() {
     for (let i = 0; i < fundo.length; ++i) {
